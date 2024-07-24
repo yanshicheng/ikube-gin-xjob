@@ -9,7 +9,6 @@ import (
 	types2 "github.com/yanshicheng/ikube-gin-xjob/apps/users/types"
 	"github.com/yanshicheng/ikube-gin-xjob/common/types"
 	"github.com/yanshicheng/ikube-gin-xjob/global"
-	"github.com/yanshicheng/ikube-gin-xjob/router"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
@@ -17,7 +16,7 @@ import (
 // 接口检查
 var _ service.OrganizationService = (*OrganizationLogic)(nil)
 
-var logic = &OrganizationLogic{}
+//var logic = &OrganizationLogic{}
 
 type OrganizationLogic struct {
 	l  *zap.Logger
@@ -270,7 +269,14 @@ func (o *OrganizationLogic) Name() string {
 	return fmt.Sprintf("%s.%s", apps.AppName, apps.AppOrganization)
 }
 
-func init() {
-	// 注册
-	router.RegistryLogic(logic)
+//func init() {
+//	// 注册
+//	router.RegistryLogic(logic)
+//}
+
+func NewOrganizationLogic() *OrganizationLogic {
+	return &OrganizationLogic{
+		l:  global.L.Named(apps.AppName).Named(apps.AppOrganization).Named("logic"),
+		db: global.DB.GetDb(),
+	}
 }

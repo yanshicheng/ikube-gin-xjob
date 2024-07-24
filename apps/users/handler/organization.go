@@ -133,7 +133,7 @@ func (h *OrganizationHandler) Name() string {
 // Config 配置函数，在这里注入依赖，并且初始化实例，供其他函数使用。
 func (h *OrganizationHandler) Config() {
 	h.l = global.L.Named(apps.AppName).Named(apps.AppOrganization).Named("handler")
-	h.svc = router.GetLogic(h.Name()).(*logic.OrganizationLogic)
+	h.svc = logic.NewOrganizationLogic()
 }
 
 func init() {

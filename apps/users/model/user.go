@@ -69,9 +69,9 @@ type Organization struct {
 	model.Model
 	Name     string          `json:"name" form:"name" binding:"required,max=32" gorm:"type:varchar(32);ngit ot null;comment:团队"`
 	ParentId uint            `json:"parentId" form:"parentId" binding:"number" gorm:"type:int;not null;comment:父级"`
-	Level    int             `json:"level" form:"level"  gorm:"type:int;not null;comment:层级"`
-	Desc     string          `json:"Desc" form:"desc" binding:"required,max=56" gorm:"type:varchar(56);not null;comment:描述"`
-	Children []*Organization `gorm:"-"` // 使用指针类型存储子组织
+	Level    int             `json:"level,omitempty" form:"level"  gorm:"type:int;not null;comment:层级"`
+	Desc     string          `json:"desc,omitempty" form:"desc" binding:"max=56" gorm:"type:varchar(56);not null;comment:描述"`
+	Children []*Organization `json:"children,omitempty" gorm:"-"` // 使用指针类型存储子组织
 }
 
 // 递归函数，通过 GORM 查询数据库，返回从顶层到当前组织的层级结构

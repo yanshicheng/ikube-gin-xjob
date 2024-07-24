@@ -9,7 +9,6 @@ import (
 	types2 "github.com/yanshicheng/ikube-gin-xjob/apps/users/types"
 	"github.com/yanshicheng/ikube-gin-xjob/common/types"
 	"github.com/yanshicheng/ikube-gin-xjob/global"
-	"github.com/yanshicheng/ikube-gin-xjob/router"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
@@ -111,7 +110,14 @@ func (o *PositionLogic) Name() string {
 	return fmt.Sprintf("%s.%s", users.AppName, users.AppPosition)
 }
 
-func init() {
-	// 注册
-	router.RegistryLogic(positionLogic)
+//func init() {
+//	// 注册
+//	router.RegistryLogic(positionLogic)
+//}
+
+func NewPositionLogic() *PositionLogic {
+	return &PositionLogic{
+		l:  global.L.Named(users.AppName).Named(users.AppPosition).Named("logic"),
+		db: global.DB.GetDb(),
+	}
 }

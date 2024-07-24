@@ -8,7 +8,7 @@ import (
 )
 
 type PositionService interface {
-	List(*gin.Context, types2.PositionListReq) ([]*model.Position, error)
+	List(*gin.Context, types2.PositionListSearchReq) ([]*model.Position, error)
 	Create(*gin.Context, *model.Position) error
 	Put(*gin.Context, types.SearchId, *model.Position) (*model.Position, error)
 	Delete(*gin.Context, types.SearchId) error

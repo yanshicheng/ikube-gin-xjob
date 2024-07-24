@@ -113,7 +113,7 @@ func (h *PositionHandler) Name() string {
 // Config 配置函数，在这里注入依赖，并且初始化实例，供其他函数使用。
 func (h *PositionHandler) Config() {
 	h.l = global.L.Named(users.AppName).Named(users.AppPosition).Named("handler")
-	h.svc = router.GetLogic(h.Name()).(*logic.PositionLogic)
+	h.svc = logic.NewPositionLogic()
 }
 
 func init() {
