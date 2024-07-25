@@ -10,14 +10,11 @@ import (
 	"github.com/yanshicheng/ikube-gin-xjob/common/sql"
 	"github.com/yanshicheng/ikube-gin-xjob/common/types"
 	"github.com/yanshicheng/ikube-gin-xjob/global"
-	"github.com/yanshicheng/ikube-gin-xjob/router"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
 var _ service.RoleService = (*RoleLogic)(nil)
-
-var roleLogic = &RoleLogic{}
 
 type RoleLogic struct {
 	l  *zap.Logger
@@ -99,7 +96,9 @@ func (r *RoleLogic) Name() string {
 	return fmt.Sprintf("%s.%s", apps.AppName, apps.AppRole)
 }
 
-func init() {
-	// 注册
-	router.RegistryLogic(roleLogic)
+func NewRoleLogic() *RoleLogic {
+	return &RoleLogic{
+		l:  global.L.Named(apps.AppName).Named(apps.AppRole).Named("logic"),
+		db: global.DB.GetDb(),
+	}
 }

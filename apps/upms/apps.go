@@ -2,5 +2,7 @@ package upms
 
 const (
 	AppName = "upms"
-	AppRole = "rule"
+	AppRole = "role"
+	AppMenu = "menu"
+	AppUpms = "upms"
 )

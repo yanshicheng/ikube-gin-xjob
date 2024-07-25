@@ -19,18 +19,18 @@ type Menu struct {
 	Path             string  `json:"path" form:"path" binding:"required,max=32" gorm:"type:varchar(32);not null;comment:路由路径"`
 	Name             string  `json:"name" form:"name" binding:"required,max=32" gorm:"type:varchar(32);not null;unique;comment:唯一标识名称" `
 	Component        string  `json:"component" form:"component" binding:"required,max=255" gorm:"type:varchar(255);not null;comment:组件路径" `
-	Redirect         string  `json:"redirect" form:"redirect" binding:"max=255" gorm:"type:varchar(255);comment:重定向路径" `
-	Title            string  `json:"title" form:"title" binding:"max=26" gorm:"type:varchar(26);not null;comment:菜单标题" `
+	Redirect         string  `json:"redirect,omitempty" form:"redirect" binding:"max=255" gorm:"type:varchar(255);comment:重定向路径" `
+	Title            string  `json:"title" form:"title" binding:"required,max=26" gorm:"type:varchar(26);not null;comment:菜单标题" `
 	Icon             string  `json:"icon"  form:"icon" binding:"max=32" gorm:"type:varchar(32);comment:菜单图标" `
 	Expanded         bool    `json:"expanded"  form:"expanded" binding:"boolean" gorm:"type:tinyint(1);default:false;comment:是否默认展开" `
-	OrderNo          int     `json:"orderNo" form:"orderNo" binding:"required,number" gorm:"type:tinyint;not null;comment:菜单顺序编号" `
+	OrderNo          *int    `json:"orderNo" form:"orderNo" binding:"required,number" gorm:"type:tinyint;not null;comment:菜单顺序编号" `
 	Hidden           bool    `json:"hidden"  form:"hidden" binding:"required" gorm:"default:false;comment:是否隐藏菜单"`
 	HiddenBreadcrumb bool    `json:"hiddenBreadcrumb" form:"hiddenBreadcrumb" binding:"boolean" gorm:"type:tinyint(1);default:false;comment:是否隐藏面包屑"`
 	Single           bool    `json:"single" form:"single" binding:"boolean" gorm:"type:tinyint(1);default:false;comment:是否单级菜单显示"`
 	FrameSrc         string  `json:"frameSrc" form:"frameSrc" binding:"max=255" gorm:"type:varchar(255);comment:内嵌iframe的地址"`
 	FrameBlank       bool    `json:"frameBlank" form:"frameBlank" binding:"boolean" gorm:"type:tinyint(1);default:false;comment:内嵌iframe是否新窗口打开" `
 	KeepAlive        bool    `json:"keepAlive" form:"keepAlive" binding:"boolean" gorm:"type:tinyint(1);default:true;comment:开启keep-alive"`
-	ParentId         uint    `json:"parentId" form:"parentId"  binding:"required,number" gorm:"type:int;not null;comment:父级"` // 关联父级路由
+	ParentId         *uint   `json:"parentId" form:"parentId"  binding:"required,number" gorm:"type:int;not null;comment:父级"` // 关联父级路由
 	Level            int     `json:"level" form:"level" gorm:"type:int;not null;comment:层级"`
 	Children         []*Menu `gorm:"-" json:"children"` // 子路由，不存储在数据库中，只用于加载和显示
 
@@ -43,7 +43,8 @@ func (*Menu) TableName() string {
 // BeforeCreate 机构表 创建钩子函数
 func (o *Menu) BeforeCreate(tx *gorm.DB) error {
 	// 检查是否有父节点，如果没有父节点，则为根节点
-	if o.ParentId != 0 {
+	ParentId := int(*o.ParentId)
+	if ParentId != 0 {
 		// 如果 ParentID 不为0，说明此节点有父节点
 
 		var parent Menu
@@ -93,7 +94,8 @@ func (r *RoleMenu) TableName() string {
 type Upms struct {
 	model.Model
 	Name     string     `json:"name" form:"name" binding:"required,max=32" gorm:"type:varchar(32);not null;unique;comment:权限名称"`
-	RoleId   uint       `json:"roleId" form:"roleId" binding:"required,number" gorm:"type:int;not null;comment:角色"`
+	RoleId   uint       `json:"roleId" form:"roleId" binding:"required,number" gorm:"type:int;not null;role_menu_unique;comment:角色"`
+	MenuId   uint       `json:"menuId" form:"menuId" binding:"required,number" gorm:"type:int;not null;uniqueIndex:role_menu_unique;comment:菜单" `
 	Resource string     `json:"resource" form:"resource" binding:"required,max=255" gorm:"type:varchar(255);not null;comment:资源"`
 	Type     ActionType `json:"type" form:"type"  binding:"required,oneof=0 1" gorm:"type:tinyint;not null;comment:操作类型"`
 }

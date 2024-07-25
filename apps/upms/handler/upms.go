@@ -14,22 +14,22 @@ import (
 	"go.uber.org/zap"
 )
 
-var _ router.GinService = (*RoleHandler)(nil)
-var roleHandler = &RoleHandler{}
+var _ router.GinService = (*UpmsHandler)(nil)
+var upmsHandler = &UpmsHandler{}
 
-type RoleHandler struct {
+type UpmsHandler struct {
 	l   *zap.Logger
-	svc *logic.RoleLogic
+	svc *logic.UpmsHandler
 }
 
-func (h *RoleHandler) PublicRegistry(gin.IRouter) {
+func (h *UpmsHandler) PublicRegistry(gin.IRouter) {
 
 }
 
 // AuthRegistry 注册认证接口
-func (h *RoleHandler) AuthRegistry(r gin.IRouter) {
+func (h *UpmsHandler) AuthRegistry(r gin.IRouter) {
 	// 分组路由
-	group := r.Group(fmt.Sprintf("%s/%s", apps.AppName, apps.AppRole))
+	group := r.Group(fmt.Sprintf("%s/%s", apps.AppName, apps.AppUpms))
 	{
 		group.GET("/", h.list)
 		group.POST("/", h.create)
@@ -38,8 +38,8 @@ func (h *RoleHandler) AuthRegistry(r gin.IRouter) {
 	}
 }
 
-func (h *RoleHandler) list(c *gin.Context) {
-	search := types2.RoleSearchReq{}
+func (h *UpmsHandler) list(c *gin.Context) {
+	search := types2.UpmsSearchReq{}
 	if err := c.ShouldBindQuery(&search); err != nil {
 		global.LSys.Error(fmt.Sprintf("参数绑定失败: %s", err.Error()))
 		response.FailedParam(c, err)
@@ -54,8 +54,8 @@ func (h *RoleHandler) list(c *gin.Context) {
 	response.SuccessSlice(c, list)
 }
 
-func (h *RoleHandler) create(c *gin.Context) {
-	var req model.Role
+func (h *UpmsHandler) create(c *gin.Context) {
+	var req model.Upms
 	if err := c.ShouldBindJSON(&req); err != nil {
 		global.LSys.Error(fmt.Sprintf("参数绑定失败: %s", err.Error()))
 		response.FailedParam(c, err)
@@ -68,9 +68,9 @@ func (h *RoleHandler) create(c *gin.Context) {
 	response.SuccessMap(c, req)
 }
 
-func (h *RoleHandler) put(c *gin.Context) {
-	var position types2.RoleUpdateRequest
-	if err := c.ShouldBindJSON(&position); err != nil {
+func (h *UpmsHandler) put(c *gin.Context) {
+	var req model.Upms
+	if err := c.ShouldBindJSON(&req); err != nil {
 		global.LSys.Error(fmt.Sprintf("参数绑定失败: %s", err.Error()))
 		response.FailedParam(c, err)
 		return
@@ -81,8 +81,8 @@ func (h *RoleHandler) put(c *gin.Context) {
 		response.FailedParam(c, err)
 		return
 	}
-	h.l.Debug(fmt.Sprintf("修改参数: %+v, 修改id: %d", position, id))
-	if newPosition, err := h.svc.Put(c, id, &position); err != nil {
+	h.l.Debug(fmt.Sprintf("修改参数: %+v, 修改id: %d", req, id))
+	if newPosition, err := h.svc.Put(c, id, &req); err != nil {
 		response.FailedStr(c, err.Error())
 		return
 	} else {
@@ -91,7 +91,7 @@ func (h *RoleHandler) put(c *gin.Context) {
 
 }
 
-func (h *RoleHandler) delete(c *gin.Context) {
+func (h *UpmsHandler) delete(c *gin.Context) {
 	var id types.SearchId
 	if err := c.ShouldBindUri(&id); err != nil {
 		global.LSys.Error(fmt.Sprintf("参数绑定失败: %s", err.Error()))
@@ -106,16 +106,16 @@ func (h *RoleHandler) delete(c *gin.Context) {
 	response.SuccessMap(c, nil)
 }
 
-func (h *RoleHandler) Name() string {
-	return fmt.Sprintf("%s.%s", apps.AppName, apps.AppRole)
+func (h *UpmsHandler) Name() string {
+	return fmt.Sprintf("%s.%s", apps.AppName, apps.AppUpms)
 }
 
 // Config 配置函数，在这里注入依赖，并且初始化实例，供其他函数使用。
-func (h *RoleHandler) Config() {
-	h.l = global.L.Named(apps.AppName).Named(apps.AppRole).Named("handler")
-	h.svc = logic.NewRoleLogic()
+func (h *UpmsHandler) Config() {
+	h.l = global.L.Named(apps.AppName).Named(apps.AppUpms).Named("handler")
+	h.svc = logic.NewUpmsHandler()
 }
 
 func init() {
-	router.RegistryGinRouter(roleHandler)
+	router.RegistryGinRouter(upmsHandler)
 }

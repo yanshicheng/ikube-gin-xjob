@@ -44,9 +44,9 @@ func (o *PositionLogic) Create(c *gin.Context, req *model.Position) error {
 		o.l.Error(fmt.Sprintf("查询机构失败无法创建职位: %s， ID: %d", err.Error(), req.OrganizationId))
 		return fmt.Errorf("查询机构失败无法创建职位,ID: %d", req.OrganizationId)
 	}
-	// 创建机构，只允许创建主体机构
-	if org.Level == 0 {
-		return fmt.Errorf("创建职位失败，组织不是主体")
+	//  主体机构不允许创建职位
+	if org.ParentId == 0 {
+		return fmt.Errorf("创建职位失败，主体机构不允许创建职位")
 	}
 	if err := o.db.WithContext(c).Model(&model.Position{}).Create(&req).Error; err != nil {
 		o.l.Error(fmt.Sprintf("创建职位失败: %s", err.Error()))
@@ -56,8 +56,8 @@ func (o *PositionLogic) Create(c *gin.Context, req *model.Position) error {
 }
 func (o *PositionLogic) Put(c *gin.Context, search types.SearchId, req *model.Position) (*model.Position, error) {
 	// 只允许修改名称
-	//updates := map[string]interface{}{"name": pos.Name}
-	if err := o.db.WithContext(c).Model(&model.Position{}).Where("id = ?", search.Id).Updates(map[string]string{"name": req.Name}).Error; err != nil {
+	updates := map[string]interface{}{"name": req.Name}
+	if err := o.db.WithContext(c).Model(&model.Position{}).Where("id = ?", search.Id).Updates(updates).Error; err != nil {
 		o.l.Error(fmt.Sprintf("更新职位失败: %s", err.Error()))
 		return nil, fmt.Errorf("更新职位失败: %d", search.Id)
 	}
